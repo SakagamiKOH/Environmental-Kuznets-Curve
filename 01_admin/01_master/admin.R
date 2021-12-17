@@ -13,7 +13,14 @@ preamble <- function(){
 
 
 build <- function(){
+  lets('build', 'Japan_gdp_tidy')
+  lets('build', 'US_tidy')
+  lets("build", 'CO2_tidy')
+  lets('bulid', 'Japan_gdp_ready')
+  lets('build', "US_ready")
+  lets('build', 'CO2_ready')
   
+  lets('build', 'master')
 }
 
 
@@ -32,6 +39,7 @@ postamble <- function(){
 }
 
 lets <- function(verb_name, object_name){
+  ##lets関数は引数verb_nameとobject_nameにより他のファイルに飛びコードを走らせる
   if (verb_name == 'set' && object_name == 'preamble'){
     source(here::here('01_admin', '02_preamble', 'R', 'admin.R'))
   }
