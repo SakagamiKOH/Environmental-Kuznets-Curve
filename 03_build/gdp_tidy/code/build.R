@@ -11,10 +11,10 @@ main <- function(){
   ##raw dataをきれいにする
   tidy_data <- raw_data %>% 
     ##日付順で並び替える
-    prep_data(data_order = "ymd") %>%
+    prep_data(data_order = "y") %>%
     ##重複しているデータがないかの確認
     prep_duplictae_count() %>% 
-    ##
+    ##スペル違い、スペース違いだが実際は同じことを指すデータ
     prep_gdp_synnoyms()
   
   basics$save_interim(tidy_data, my_folder, extension = "tidy")
@@ -41,7 +41,7 @@ read_raw <- function(my_folder, name_list){
     purrr::map(readr::read_csv)
   
   data_output <- data_list %>% 
-    ##データフレームを縦積みするから、.id引数に"country_num"を指定して縦積みしたデータを区別する。
+    ##データフレームを縦積みするから.id引数に"country_num"を指定して縦積みしたデータを区別する。
     dplyr::bind_rows(.id = "country_num") %>% 
     ##列を追加する。mutate(変数名=変数定義)
     dplyr::mutate(country = name_list[as.numeric(country_num)]) %>% 
@@ -50,3 +50,66 @@ read_raw <- function(my_folder, name_list){
   
   return(data_output)
 }
+
+
+##order the input data by date
+prep_date <- function(data_input, data_order){
+  data_output <- data_input %>% 
+    ##mutate関数は変数列を追加する関数で、mutate(変数名=変数定義)で使う
+    dplyr::mutate(
+      ##lubridate::parse_date_time関数はデータを日付に解析(parse)する
+      ##https://kazutan.github.io/SappoRoR8/01-lubridate.html
+      data_formatted = lubridate::parse_date_time(
+        data_input$year,
+        order = data_order
+      )
+    )
+  
+  return(data_output)
+}
+
+
+##check duplication
+prep_duplicate_count <- function(data_input){
+  
+  data_output <- data_input %>% 
+    ##data_inputをcountry, data_formattedごとに細分化
+    dplyr::group_by(country, data_formatted) %>% 
+    ##上記細分化したグループの行数を数える
+    dplyr::mutate(duplicate_id = dplyr::row_number()) %>% 
+    ##細分化したデータの統合
+    dplyr::ungroup()
+  
+  return(data_output)
+}
+##if there is no double count duplicate_id column will be 1
+
+
+##omit the data that is double counted
+prep_gdp_synnoyms <- function(data_input){
+  data_output <- data_input %>% 
+    ##まず新たにcountry_rename列を作り、その列全要素を"country"
+    dplyr::mutate(country_rename = "country",
+                  ##replace(original data, replaceされるもの, replaceするもの)
+                  ##http://cse.naro.affrc.go.jp/takezawa/r-tips/r/15.html
+                  country_rename = replace(
+                    ##country_renameのうち
+                    country_rename,
+                    ##"Japan", "JPN", "japan","Jpn"のものを
+                    country_rename %in% c("Japan", "JPN", "japan","Jpn"),
+                    ##"Japan"に置換する
+                    "Japan"
+                  ),
+                  country_rename = replace(
+                    country_rename,
+                    country_rename %in% c("the US", "The US", "United states",
+                                          "UnitedStates", "the United States",
+                                          "America"),
+                  "United States"))
+    
+  return(data_output)
+}
+
+box::use(`function`/basic)
+
+main()
