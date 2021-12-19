@@ -11,13 +11,13 @@ main <- function(){
   ##raw dataをきれいにする
   tidy_data <- raw_data %>% 
     ##日付順で並び替える
-    prep_data(data_order = "y") %>%
+    prep_date(data_order = "y") %>%
     ##重複しているデータがないかの確認
     prep_duplictae_count() %>% 
     ##スペル違い、スペース違いだが実際は同じことを指すデータ
     prep_gdp_synnoyms()
   
-  basics$save_interim(tidy_data, my_folder, extension = "tidy")
+  save_interim(tidy_data, my_folder, extension = "tidy")
 }
 
 
@@ -70,7 +70,7 @@ prep_date <- function(data_input, data_order){
 
 
 ##check duplication
-prep_duplicate_count <- function(data_input){
+prep_duplictae_count <- function(data_input){
   
   data_output <- data_input %>% 
     ##data_inputをcountry, data_formattedごとに細分化
@@ -110,6 +110,8 @@ prep_gdp_synnoyms <- function(data_input){
   return(data_output)
 }
 
-box::use(`function`/basic)
+
+##box::use(`functions`/basic)
+source("01_admin/functions/basics.R")
 
 main()
