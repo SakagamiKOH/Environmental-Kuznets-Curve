@@ -10,7 +10,7 @@ main <- function(){
     ##check data type
     prep_asserts()
   
-  basic$save_interim(tidy_data, my_folder, extension = "tidy")
+  save_interim(tidy_data, my_folder, extension = "tidy")
 }
 
 
@@ -88,6 +88,8 @@ prep_asserts <- function(data_input){
 }
 
 
-box::use(`function`/basics)
+##import a module or package
+source("01_admin/functions/basics.R")
+##box::use(`functions`/basics)
 
 main()
