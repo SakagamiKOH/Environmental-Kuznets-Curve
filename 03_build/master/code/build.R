@@ -3,7 +3,7 @@ main <- function(){
   pollution_data <- read_interim("pollution", extension = "ready")
 
   ##マージするためにプライマリーキーをそろえる(Type, 表記法など)
-  gdp_data_for_merge <- prep_gdp(gdp_data, interval = 5)
+  gdp_data_for_merge <- prep_gdp(gdp_data)
 
   ##マージする
   master_data <- prep_merge(
