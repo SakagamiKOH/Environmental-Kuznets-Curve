@@ -62,9 +62,10 @@ prep_date <- function(data_input, data_order){
       data_formatted = lubridate::parse_date_time(
         data_input$year,
         order = data_order
-      )
-    )
-  
+      ) 
+    ) 
+    
+
   return(data_output)
 }
 
@@ -79,6 +80,7 @@ prep_duplictae_count <- function(data_input){
     dplyr::mutate(duplicate_id = dplyr::row_number()) %>% 
     ##細分化したデータの統合
     dplyr::ungroup()
+
   
   return(data_output)
 }
@@ -96,13 +98,13 @@ prep_gdp_synnoyms <- function(data_input){
                     ##country_renameのうち
                     country_rename,
                     ##"Japan", "JPN", "japan","Jpn"のものを
-                    country_rename %in% c("Japan", "JPN", "japan","Jpn"),
+                    country %in% c("Japan", "JPN", "japan","Jpn"),
                     ##"Japan"に置換する
                     "Japan"
                   ),
                   country_rename = replace(
                     country_rename,
-                    country_rename %in% c("the US", "The US", "United states",
+                    country %in% c("the US", "The US", "United States",
                                           "UnitedStates", "the United States",
                                           "America"),
                   "United States"))
