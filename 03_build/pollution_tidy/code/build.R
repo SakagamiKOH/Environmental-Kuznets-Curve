@@ -59,8 +59,8 @@ prep_nonnumeric <- function(data_input){
       
   　##missing_dummyをpollution_originalが"missing"またはNAのとき1,以外を0と定義
     missing_dummy = dplyr::if_else(
-      (pollution_original =="missing"|is.na(pollution_original)),
-       true = 1, false = 0),
+      pollution_original =="missing",
+       true = 1, false = 0, missing = 0),
     
     ##pollutionを“missing”のときのみNA,以外をpollution_originalと定義
     pollution = replace(pollution_original,
