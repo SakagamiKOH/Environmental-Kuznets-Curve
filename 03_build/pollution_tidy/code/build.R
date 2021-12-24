@@ -63,13 +63,14 @@ prep_nonnumeric <- function(data_input){
        true = 1, false = 0, missing = 0),
     
     ##pollutionを“missing”のときのみNA,以外をpollution_originalと定義
-    pollution = replace(pollution_original,
+    pollution_numeric = replace(pollution_original,
                         which(pollution_original == "missing"),
                         NA),
     
     ##hange pollution_original into numeric from character
     ##ただしNAもnumericに分類されることに注意
-    pollution = as.numeric(pollution))
+    pollution_numeric = as.numeric(pollution_numeric),
+    year = as.numeric(year))
   
   return(data_output)
 }
@@ -80,7 +81,7 @@ prep_asserts <- function(data_input){
   
   ##test_that(desc = "test name" {test code})
   testthat::test_that(desc = "data type correct",{
-    testthat::expect_true(is.numeric(data_input$pollution))
+    testthat::expect_true(is.numeric(data_input$pollution_numeric))
     testthat::expect_true(is.numeric(data_input$missing_dummy))
   })
   
