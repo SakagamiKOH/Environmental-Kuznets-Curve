@@ -1,19 +1,22 @@
 main <- function(){
-  my_folder <- "master"
+  my_folder_name <- "master"
   ##データの読み込み
-  my_data <- read_interim(my_folder)
+  my_data <- read_interim(my_folder_name)
+  ##main_varnames <- c("(Intercept)" = "Constant",)
   output_folder <- "initial"
   
-  my_data %>% 
-    summarize_data()
+  ##記述統計量の作り方が不明
+  ##my_data %>% 
+  ##  summarize_data()
   
   my_data %>% 
     run_regression() %>% 
     format_and_save_table(
-      my_file = "initial_reg",
+      my_file_name = "initial_reg",
       my_title = "Initial regression",
-      my_varnames = main_varnames,
-      my_folder = my_folder
+      ##回帰結果の表の説明を一部変更
+      ##my_varnames = main_varnames,
+      my_folder = my_folder_name
     )
   
   my_data %>% 
@@ -24,7 +27,7 @@ main <- function(){
       group_var = country
     ) %>% 
     save_my_plot(var_name = "Environmenta Kuznets Curve",
-                 folder_name = my_folder)
+                 folder_name = my_folder_name)
 }
 
 
@@ -50,7 +53,9 @@ run_regression <- function(data_input){
 
 
 format_and_save_table <- function(estimates_lists, my_file_name,
-                                  my_title, my_varnames, my_folder){
+                                  my_title,  my_folder
+                                  ##my_varnames
+                                  ){
   
   ##formatとパスを指定
   my_file_tex0 <- paste0(my_file_name, ".text")
@@ -68,7 +73,7 @@ format_and_save_table <- function(estimates_lists, my_file_name,
     gof_omit = my_content,
     fmt = my_fmt,
     title = my_title,
-    coef_map = my_varnames,
+    ##coef_map = my_varnames,
     add_rows = my_rows,
     output = "latex", booktabs = TRUE
   ) %>% 
