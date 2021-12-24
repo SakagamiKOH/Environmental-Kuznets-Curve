@@ -95,10 +95,17 @@ prep_gdp_synnoyms <- function(data_input){
 
 
 check_duplication <- function(data_input){
-  data_input %>% 
-    dplyr::if_else(setequal(duplicate_id, rep(1, nrow())),
-                   true = dplyr::select(-duplicate_id) %>% return(),
-                   false = print("Error : There is duplication !!"))
+  num_row <- nrow(data_input)
+  dup_id <- data_input %>% dplyr::select(duplicate_id)
+
+  if(setequal(dup_id, as.data.frame(rep(1, num_row)))){
+    data_output <- data_input %>% dplyr::select(-duplicate_id)
+    
+    return(data_output)
+  }else{
+    print("Error : There is duplication !!")
+  }
+  
 }
 
 
