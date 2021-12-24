@@ -17,11 +17,9 @@ main <- function(){
 ##結合のためにプライマリーキーを整えたgdpデータを作成
 prep_gdp <- function(data_input, interval){
   data_output <- data_input %>% 
-    dplyr::mutate(country_id = dplyr::if_else(country == "Japan", "JPN", "no code"),
-                  country_id = dplyr::if_else(student == "United States", "USA", country),
-                  ) %>% 
-    ##無駄な列を削除
-    dplyr::select( - country)
+    dplyr::mutate(country = dplyr::if_else(country == "Japan", "JPN", country),
+                  country = dplyr::if_else(country == "United States", "USA", country),
+                  ) 
   
   return(data_output)
 }
@@ -30,8 +28,8 @@ prep_gdp <- function(data_input, interval){
 prep_merge <- function(gdp_data, pollution_data){
   data_output <- gdp_data %>% 
     ##by引数でプライマリーキーを対応付ける
-    dplyr::left_join(pollution_data, by = c("country_code" = "country",
-                                            "group_5years" = "year"))
+    dplyr::left_join(pollution_data, by = c("country" = "country",
+                                            "year" = "group_5year"))
   
   return(data_output)
 }
