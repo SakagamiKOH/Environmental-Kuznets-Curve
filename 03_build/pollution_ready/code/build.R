@@ -6,8 +6,7 @@ main <- function(){
     ##generate standard year table with interval = 5
     gen_yeartab(interval = 5) 
 
-  View(ready_data)
-  ##save_interim(ready_data, my_folder, extension = "ready")
+  save_interim(ready_data, my_folder, extension = "ready")
 }
 
 
@@ -21,7 +20,8 @@ gen_yeartab <- function(data_input, interval){
                                    false = 2, 
                                    missing = 3)) %>% 
     dplyr::group_by(group) %>% 
-    dplyr::summarise(pollution = mean(pollution)) %>% 
+    dplyr::summarise(pollution = mean(pollution, na.rm = TRUE),
+                     missing_rate = mean(missing_dummy)) %>% 
     dplyr::ungroup() 
   
   data_output <- data_input %>% 
@@ -35,7 +35,7 @@ gen_yeartab <- function(data_input, interval){
     dplyr::filter(quotient %% 1 == 0) %>% 
     dplyr::select(-pollution) %>% 
     dplyr::left_join(data_summarized, by = ("group" = "group")) %>% 
-    dplyr::select(-c("group", "quotient"))
+    dplyr::select(-c("group", "quotient","pollution_original","missing_dummy"))
   
   return(data_output)  
 }
