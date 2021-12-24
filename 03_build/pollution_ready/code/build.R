@@ -14,18 +14,18 @@ gen_yeartab <- function(data_input, interval){
 
   data_summarized <- data_input %>% 
     ##interval 年を基準に年を割り振る
-    dplyr::mutate(group = round(as.numeric(year)/interval) * 
+    dplyr::mutate(group = round(year/interval) * 
                     dplyr::if_else(country == "JPN", 
                                    true = 1, 
                                    false = 2, 
                                    missing = 3)) %>% 
     dplyr::group_by(group) %>% 
-    dplyr::summarise(pollution = mean(pollution, na.rm = TRUE),
+    dplyr::summarise(pollution = mean(pollution_numeric, na.rm = TRUE),
                      missing_rate = mean(missing_dummy)) %>% 
     dplyr::ungroup() 
   
   data_output <- data_input %>% 
-    dplyr::mutate(quotient = as.numeric(year)/interval) %>% 
+    dplyr::mutate(quotient = year/interval) %>% 
     dplyr::mutate(group = round(quotient) * 
                     dplyr::if_else(country == "JPN", 
                                    true = 1, 
@@ -33,9 +33,11 @@ gen_yeartab <- function(data_input, interval){
                                    missing = 3)) %>% 
     ##intervalで割り切れる年の行だけ抽出
     dplyr::filter(quotient %% 1 == 0) %>% 
-    dplyr::select(-pollution) %>% 
+    dplyr::select(-pollution_numeric) %>% 
     dplyr::left_join(data_summarized, by = ("group" = "group")) %>% 
-    dplyr::select(-c("group", "quotient","pollution_original","missing_dummy"))
+    ##余分な行を削除
+    dplyr::select(-c("group", "quotient","pollution_original","missing_dummy")) %>% 
+    dplyr::rename(group_5year = year)
   
   return(data_output)  
 }
