@@ -16,8 +16,7 @@ main <- function(){
     prep_gdp_synnoyms() %>% 
     check_duplication()
   
-  View(tidy_data)
-  ##save_interim(tidy_data, my_folder, extension = "tidy")
+  save_interim(tidy_data, my_folder, extension = "tidy")
 }
 
 
