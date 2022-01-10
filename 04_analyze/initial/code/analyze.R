@@ -2,21 +2,27 @@ main <- function(){
   my_folder_name <- "master"
   ##データの読み込み
   my_data <- read_interim(my_folder_name)
-  ##main_varnames <- c("(Intercept)" = "Constant",)
+  main_varnames <- c("(Intercept)" = "Intercept",
+                     "gdp_per_cap" = "gdp_per_capita",
+                     "I(gdp_per_cap^2)" = "(gdp_per_capita)^2")
   output_folder <- "initial"
+  
   
   ##記述統計量の作り方が不明
   ##my_data %>% 
   ##  summarize_data()
   
+  
   my_data %>% 
+    ##returns reg outcome as a list
     run_regression() %>% 
+    ##change that list as a format table, then save it
     format_and_save_table(
       my_file_name = "initial_reg",
       my_title = "Initial regression",
       ##回帰結果の表の説明を一部変更
-      ##my_varnames = main_varnames,
-      my_folder = my_folder_name
+      my_varnames = main_varnames,
+      my_folder = "initial"
     )
   
   my_data %>% 
@@ -32,16 +38,17 @@ main <- function(){
 
 
 run_regression <- function(data_input){
-  ##regressionの詳細を先に詰める
+  ##save regression outcome into list, then return that list. 
   estimate_list <- list(
     "OLS" = estimatr::lm_robust(
-      pollution ~ gdp_per_capita + I(gdp_per_capita^2),
+      pollution ~ gdp_per_cap + I(gdp_per_cap^2),
       clusters = country, se_type = "stata",
       data = data_input
     ),
     
-    "Fixed Effect" = estimatr::lm_robust(
-      pollution ~ gdp_per_capita + I(gdp_per_capita^2),
+    ##FEはFixed Effectの略
+    "FE" = estimatr::lm_robust(
+      pollution ~ gdp_per_cap + I(gdp_per_cap^2),
       fixed_effects = ~ country,
       clusters = country, se_type = "stata",
       data = data_input
@@ -52,9 +59,11 @@ run_regression <- function(data_input){
 }
 
 
-format_and_save_table <- function(estimates_lists, my_file_name,
-                                  my_title,  my_folder
-                                  ##my_varnames
+format_and_save_table <- function(estimates_lists, 
+                                  my_file_name,
+                                  my_title,  
+                                  my_folder,
+                                  my_varnames
                                   ){
   
   ##formatとパスを指定
@@ -64,16 +73,17 @@ format_and_save_table <- function(estimates_lists, my_file_name,
   my_file_html <- here::here("04_analyze",my_folder,"table",my_file_html0)
   
   my_content <- "^R2$|Std.Errors"
+  ##Define my format
   my_fmt <- "%.2f"
-  my_rows <- tibble::tribble(~term, ~'OLS', 'Fixed Effect', 'Clustering','Y','Y')
+  my_rows <- tibble::tribble(~term, ~'OLS', ~'FE', 'Clustering','Y','Y')
   attr(my_rows, 'position') <- 5
   
   table_tex <- modelsummary::msummary(
     estimates_lists,
     gof_omit = my_content,
-    fmt = my_fmt,
+    fmt = my_fmt, ##defined my format above
     title = my_title,
-    ##coef_map = my_varnames,
+    coef_map = my_varnames,
     add_rows = my_rows,
     output = "latex", booktabs = TRUE
   ) %>% 
@@ -96,7 +106,7 @@ format_and_save_table <- function(estimates_lists, my_file_name,
     cat(.,file = my_file_html)
 }
 
-format_tabe <- function(table_input){
+format_table <- function(table_input){
   table_output <- table_input %>% 
     kableExtra::kable_styling(bootstrap_options = c("hover", "condensed")) %>% 
     kableExtra::add_header_above(c(" " = 1, "(1)" = 1,"(2)" = 1 )) %>% 
@@ -107,7 +117,7 @@ format_tabe <- function(table_input){
   return(table_output)
 }
 
-add_double_line <- function(table_input){
+add_double_lines_latex <- function(table_input){
   table_output <- table_input %>% 
     sub("\\\\toprule","\\\\midrule\\\\midrule",.) %>% 
     sub("\\\\bottomrule","\\\\midrule\\\\midrule",.)
