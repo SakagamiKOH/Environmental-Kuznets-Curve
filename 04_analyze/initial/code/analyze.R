@@ -7,11 +7,18 @@ main <- function(){
                      "I(gdp_per_cap^2)" = "(gdp_per_capita)^2")
   output_folder <- "initial"
   
+  my_plot <- 
+    my_data %>% 
+      gen_year_order() %>% 
+      lay_basic() %>% 
+      lay_shapes() %>% 
+      lay_frame() %>% 
+      lay_titles() %>% 
+      lay_summarize()
   
-  ##記述統計量の作り方が不明
-  my_data %>% 
-    summarize_data() %>% 
-    save_table()
+  save_my_plot(my_plot, 
+               var_name = "pollution_gdp_study",
+               folder_name = "pollution_gdp_study")
   
   
   my_data %>% 
@@ -38,9 +45,7 @@ main <- function(){
 }
 
 
-summarize_data <- function(data_input){
-  
-}
+
 
 run_regression <- function(data_input){
   ##save regression outcome into list, then return that list. 
