@@ -1,7 +1,7 @@
 main <- function(){
-  my_folder_name <- "master"
+  my_folder_name <- "initial"
   ##データの読み込み
-  my_data <- read_interim(my_folder_name)
+  my_data <- read_interim("master")
   main_varnames <- c("(Intercept)" = "Intercept",
                      "gdp_per_cap" = "gdp_per_capita",
                      "I(gdp_per_cap^2)" = "(gdp_per_capita)^2")
@@ -9,8 +9,9 @@ main <- function(){
   
   
   ##記述統計量の作り方が不明
-  ##my_data %>% 
-  ##  summarize_data()
+  my_data %>% 
+    summarize_data() %>% 
+    save_table()
   
   
   my_data %>% 
@@ -22,7 +23,7 @@ main <- function(){
       my_title = "Initial regression",
       ##回帰結果の表の説明を一部変更
       my_varnames = main_varnames,
-      my_folder = "initial"
+      my_folder = my_folder_name
     )
   
   my_data %>% 
@@ -36,6 +37,10 @@ main <- function(){
                  folder_name = my_folder_name)
 }
 
+
+summarize_data <- function(data_input){
+  
+}
 
 run_regression <- function(data_input){
   ##save regression outcome into list, then return that list. 
@@ -106,6 +111,7 @@ format_and_save_table <- function(estimates_lists,
     cat(.,file = my_file_html)
 }
 
+
 format_table <- function(table_input){
   table_output <- table_input %>% 
     kableExtra::kable_styling(bootstrap_options = c("hover", "condensed")) %>% 
@@ -134,7 +140,8 @@ run_scatter <- function(data_input, x_var, y_var, group_var){
   
   plot_output <- ggplot(
     data = data_input,
-    mapping = aes(x = !!x_var, ## !!argumentについてはhttps://psych252.github.io/psych252book/figures/cheatsheets/tidyeval.pdfを参照。
+    mapping = aes(x = !!x_var, 
+                  ## !!argumentについてはhttps://psych252.github.io/psych252book/figures/cheatsheets/tidyeval.pdfを参照。
                   y = !!y_var, ##!!argumetntとした方が人間にとっての可読性が高い
                   group = !!group_var,
                   color = !!group_var)
