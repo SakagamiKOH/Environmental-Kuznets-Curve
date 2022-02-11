@@ -35,15 +35,13 @@ save_my_plot <- function(my_plot, var_name, folder_name){
   
   var_id <- 2
   ggplot2::ggsave(pdf_name[var_id],
-         width = size2, height = size1, unit = my_unit,
-         path = save_path)
+                  width = size2, height = size1, unit = my_unit,
+                  path = save_path)
   ggplot2::ggsave(png_name[var_id],
-         width = size2, height = size1, unit = my_unit,
-         dpi = "print",
-         path = save_path)
+                  width = size2, height = size1, unit = my_unit,
+                  dpi = "print",
+                  path = save_path)
   
   while (!is.null(grDevices::dev.list()))  grDevices::dev.off()
   
 }
-
-

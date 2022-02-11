@@ -4,7 +4,7 @@ main <- function(){
   my_data <- read_interim("master")
   
   ##記述統計量の表における変数名
-  var_quantitative <- c("country",
+  var_summary <- c("country",
                         "gdp_per_cap",
                         "pollution")
   
@@ -15,24 +15,9 @@ main <- function(){
   
   
   ##記述統計量の表を作成
-  check_quantitative(data = my_data,
-                     var_vector = var_quantitative,
-                     folder_name = my_folder_name)
-  
-  
-  
-  my_plot <- 
-    my_data %>% 
-      gen_year_order() %>% 
-      lay_basic() %>% 
-      lay_shapes() %>% 
-      lay_frame() %>% 
-      lay_titles() %>% 
-      lay_summarize()
-  
-  save_my_plot(my_plot, 
-               var_name = "pollution_gdp_study",
-               folder_name = "pollution_gdp_study")
+  elucidate_table(data = my_data,
+                  var_name = var_summary,
+                  output_folder = output_folder)
   
   
   my_data %>% 
