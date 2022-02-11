@@ -2,10 +2,24 @@ main <- function(){
   my_folder_name <- "initial"
   ##データの読み込み
   my_data <- read_interim("master")
+  
+  ##記述統計量の表における変数名
+  var_quantitative <- c("country",
+                        "gdp_per_cap",
+                        "pollution")
+  
   main_varnames <- c("(Intercept)" = "Intercept",
                      "gdp_per_cap" = "gdp_per_capita",
                      "I(gdp_per_cap^2)" = "(gdp_per_capita)^2")
   output_folder <- "initial"
+  
+  
+  ##記述統計量の表を作成
+  check_quantitative(data = my_data,
+                     var_vector = var_quantitative,
+                     folder_name = my_folder_name)
+  
+  
   
   my_plot <- 
     my_data %>% 
@@ -60,7 +74,8 @@ run_regression <- function(data_input){
     "FE" = estimatr::lm_robust(
       pollution ~ gdp_per_cap + I(gdp_per_cap^2),
       fixed_effects = ~ country,
-      clusters = country, se_type = "stata",
+      clusters = country, 
+      se_type = "stata",
       data = data_input
     )
   )
@@ -85,8 +100,10 @@ format_and_save_table <- function(estimates_lists,
   my_content <- "^R2$|Std.Errors"
   ##Define my format
   my_fmt <- "%.2f"
-  my_rows <- tibble::tribble(~term, ~'OLS', ~'FE', 'Clustering','Y','Y')
-  attr(my_rows, 'position') <- 5
+  my_rows <- tibble::tribble(~term, ~'OLS', ~'FE',  
+                             'Clustering','Y','Y')
+  ##二重線を引くのを何行目かを指定
+  attr(my_rows, 'position') <- 6
   
   table_tex <- modelsummary::msummary(
     estimates_lists,
@@ -101,6 +118,7 @@ format_and_save_table <- function(estimates_lists,
     format_table() %>% 
     ##define this function below
     add_double_lines_latex()
+    
   writeLines(table_tex, my_file_tex)
   
   table_image <- modelsummary::msummary(
@@ -117,8 +135,11 @@ format_and_save_table <- function(estimates_lists,
 }
 
 
+
+##check kableExtra cheat sheet https://haozhu233.github.io/kableExtra/awesome_table_in_html.html
 format_table <- function(table_input){
   table_output <- table_input %>% 
+    ##
     kableExtra::kable_styling(bootstrap_options = c("hover", "condensed")) %>% 
     kableExtra::add_header_above(c(" " = 1, "(1)" = 1,"(2)" = 1 )) %>% 
     kableExtra::kable_classic_2(full_width = F) %>% 
@@ -158,6 +179,7 @@ run_scatter <- function(data_input, x_var, y_var, group_var){
 
 
 source("01_admin/functions/basics.R")
+source("01_admin/functions/checks.R")
 source("01_admin/functions/elucidate_table.R")
 library(magrittr)
 
