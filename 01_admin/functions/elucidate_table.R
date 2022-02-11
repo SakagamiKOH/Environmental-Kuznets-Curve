@@ -1,7 +1,5 @@
 elucidate_table <- function(data, var_name, output_folder){
   
-  var_name_rlang <- rlang::enquo(var_name)
-  
   library(magrittr)
   #box::use(magrittr[`%>%`])
   
@@ -24,22 +22,22 @@ gen_table <- function(data_input, var_name){
   #box::use(magrittr[`%>%`])
   
   table_output <- data_input %>% 
+    ## 分析対象の列のみ残す
     dplyr::select(!!var_name_rlang) %>% 
     ##separate data by variable
-    
     dplyr::group_by(country) %>% 
     ##summarize data set by group that user made above
-    dplyr::summarise(Q1_gdp_per_cap = quantile(gdp_per_cap, probs = 0.25),
-                     median_gdp_per_cap = median(gdp_per_cap),
-                     mean_gdp_per_cap = mean(gdp_per_cap),
-                     Q3_gdp_per_cap = quantile(gdp_per_cap, probs = 0.75),
-                     Q1_pollution = quantile(pollution, probs = 0.25),
-                     median_pollution = median(pollution),
-                     mean_pollution = mean(pollution),
-                     Q3_pollution = quantile(pollution, probs = 0.75)
-                     ) 
-
-  
+    dplyr::summarise(A_min = min(pollution),
+                     B_first_quantile = quantile(pollution, probs = 0.25),
+                     C_median = median(pollution),
+                     D_mean = mean(pollution),
+                     E_third_quantile = quantile(pollution, probs = 0.75),
+                     F_max = max(pollution)
+                     ) %>% 
+    tidyr::gather(key = desc_stat_poll, value = value, -country) %>% 
+    tidyr::spread(key = country, value = value) %>% 
+    dplyr::mutate(JPN = round(JPN, digits = 2),
+                  USA = round(USA, digits = 2))
   
   return(table_output)
   
@@ -48,7 +46,8 @@ gen_table <- function(data_input, var_name){
 
 ##formatをtex形式に指定して、save the table
 format_and_save_table <- function(my_table, var_name, output_folder){
-  var_name <- rlang::enquo(var_name)
+  
+  var_name_rlang <- rlang::enquo(var_name)
   library(magrittr)
   # box::use(magrittr[`%>%`])
   
@@ -60,10 +59,12 @@ format_and_save_table <- function(my_table, var_name, output_folder){
 
   ##latexにも使える形式へ。細かなテーブルの設定を行っている。
   table_tex <- my_table %>% 
-    kableExtra::kbl(format = "latex", booktabs = T) %>% 
+    kableExtra::kbl(format = "latex", booktabs = TRUE) %>% 
     kableExtra::kable_styling(latex_options = "hold_position",
-                  full_width = F) %>% 
-    kableExtra::kable_classic_2(full_width = F) 
+                  full_width = FALSE) %>% 
+    kableExtra::kable_classic_2(full_width = FALSE) %>% 
+    kableExtra::footnote(general = "summarise only pollution data.", 
+                         threeparttable = T)
   writeLines(table_tex, my_file_tex)
   
   
@@ -75,7 +76,12 @@ format_and_save_table <- function(my_table, var_name, output_folder){
   ##htlm形式のテーブルの細かな見栄えの設定を行っている
   table_html <- my_table %>% 
     kableExtra::kbl(format = "html") %>% 
-    kableExtra::kable_styling(bootstrap_options = "hover") %>%
-    kableExtra::kable_classic_2(full_width = F) %>% 
+    kableExtra::kable_styling(bootstrap_options = "hover",
+                              full_width = FALSE) %>%
+    kableExtra::kable_classic_2(full_width = FALSE) %>%
+    kableExtra::footnote(general = "summarise only pollution data.", 
+                         threeparttable = T)
     cat(., file = my_file_html)
 }
+
+
